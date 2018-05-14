@@ -1,0 +1,7 @@
+XXImage.xcodeproj/xcuserdata/
+XXImage.xcworkspace/
+Pods/
+*.swp
+Podfile.lock
+.DS_Store
+XXImage.xcodeproj/project.xcworkspace/xcuserdata/
