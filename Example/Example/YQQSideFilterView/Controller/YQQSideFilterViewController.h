@@ -6,10 +6,24 @@
 //
 
 #import <UIKit/UIKit.h>
+@class YQQSideFilterViewController;
+
+typedef NS_ENUM(NSUInteger, YQQSideFilterViewControllerActionType) {
+    YQQSideFilterViewControllerActionTypeReset,
+    YQQSideFilterViewControllerActionTypeConfirm
+};
+
+@protocol YQQSideFilterViewControllerDelegate <NSObject>
+
+- (void)sideFilterViewController:(YQQSideFilterViewController *_Nullable)sideFilterViewController didSelectActionType:(YQQSideFilterViewControllerActionType)actionType;
+
+@end
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface YQQSideFilterViewController : UIViewController
+
+@property (nonatomic, weak) id<YQQSideFilterViewControllerDelegate> delegate;
 
 @property (nonatomic, assign) CGFloat sideSlipLeading;
 

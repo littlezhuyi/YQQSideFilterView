@@ -10,7 +10,7 @@
 #import "YQQSideFilterItem.h"
 #import "YQQSideFilterCategoryModel.h"
 
-@interface ViewController ()
+@interface ViewController () <YQQSideFilterViewControllerDelegate>
 
 @end
 
@@ -24,7 +24,14 @@
 - (IBAction)show:(UIButton *)sender {
     YQQSideFilterViewController *filter = [YQQSideFilterViewController new];
     filter.dataArray = [self createGroupModel];
+    filter.delegate = self;
     [filter show];
+}
+
+- (void)sideFilterViewController:(YQQSideFilterViewController *)sideFilterViewController didSelectActionType:(YQQSideFilterViewControllerActionType)actionType {
+    if (actionType == YQQSideFilterViewControllerActionTypeReset) {
+        sideFilterViewController.dataArray = [self createGroupModel];
+    }
 }
 
 - (NSArray *)createGroupModel {

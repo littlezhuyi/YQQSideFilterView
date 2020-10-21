@@ -99,7 +99,10 @@
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    
+    YQQSideFilterCategoryModel *categoryModel = [self.dataArray objectAtIndex:indexPath.section];
+    YQQSideFilterItem *item = [categoryModel.items objectAtIndex:indexPath.item];
+    item.selected = !item.selected;
+    [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -187,11 +190,16 @@
 }
 
 - (void)commitButtonAction:(UIButton *)sender {
-    
+    if ([self.delegate respondsToSelector:@selector(sideFilterViewController:didSelectActionType:)]) {
+        [self.delegate sideFilterViewController:self didSelectActionType:YQQSideFilterViewControllerActionTypeConfirm];
+    }
+    [self close];
 }
 
 - (void)resetButtonAction:(UIButton *)sender {
-    
+    if ([self.delegate respondsToSelector:@selector(sideFilterViewController:didSelectActionType:)]) {
+        [self.delegate sideFilterViewController:self didSelectActionType:YQQSideFilterViewControllerActionTypeReset];
+    }
 }
 
 - (UIView *)createBottomBar {
