@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		257668A8253AB41A0027A05E /* YQQSideFilterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 257668A7253AB41A0027A05E /* YQQSideFilterViewController.m */; };
-		257668B9253B07870027A05E /* data.json in Resources */ = {isa = PBXBuildFile; fileRef = 257668B8253B07870027A05E /* data.json */; };
 		257668BD253B11B60027A05E /* YQQSideFilterItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 257668BC253B11B60027A05E /* YQQSideFilterItem.m */; };
 		257668C2253B14540027A05E /* YQQSideFilterCategoryModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 257668C1253B14540027A05E /* YQQSideFilterCategoryModel.m */; };
 		25897BCA253D98D00083D03C /* YQQCollectionPushReusableHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 25897BC8253D98D00083D03C /* YQQCollectionPushReusableHeaderView.m */; };
@@ -32,7 +31,6 @@
 /* Begin PBXFileReference section */
 		257668A6253AB41A0027A05E /* YQQSideFilterViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YQQSideFilterViewController.h; sourceTree = "<group>"; };
 		257668A7253AB41A0027A05E /* YQQSideFilterViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YQQSideFilterViewController.m; sourceTree = "<group>"; };
-		257668B8253B07870027A05E /* data.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = data.json; sourceTree = "<group>"; };
 		257668BB253B11B60027A05E /* YQQSideFilterItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YQQSideFilterItem.h; sourceTree = "<group>"; };
 		257668BC253B11B60027A05E /* YQQSideFilterItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YQQSideFilterItem.m; sourceTree = "<group>"; };
 		257668C0253B14540027A05E /* YQQSideFilterCategoryModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YQQSideFilterCategoryModel.h; sourceTree = "<group>"; };
@@ -111,7 +109,6 @@
 		255937AD253D83730016EC3E /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				257668B8253B07870027A05E /* data.json */,
 				257668C0253B14540027A05E /* YQQSideFilterCategoryModel.h */,
 				257668C1253B14540027A05E /* YQQSideFilterCategoryModel.m */,
 				257668BB253B11B60027A05E /* YQQSideFilterItem.h */,
@@ -223,7 +220,6 @@
 				25897BD7253D98F70083D03C /* YQQCollectionSwitchReusableHeaderView.xib in Resources */,
 				25DFBEBF253AABF200935726 /* LaunchScreen.storyboard in Resources */,
 				25897BDD253D991E0083D03C /* YQQCollectionViewNormalCell.xib in Resources */,
-				257668B9253B07870027A05E /* data.json in Resources */,
 				25DFBEBC253AABF200935726 /* Assets.xcassets in Resources */,
 				25897BCB253D98D00083D03C /* YQQCollectionPushReusableHeaderView.xib in Resources */,
 				25DFBEBA253AABF000935726 /* Main.storyboard in Resources */,
