@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		257668A8253AB41A0027A05E /* YQQSideFilterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 257668A7253AB41A0027A05E /* YQQSideFilterViewController.m */; };
+		2509E4AC260470050075F62C /* YQQSideFilterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2509E4AB260470050075F62C /* YQQSideFilterViewController.m */; };
 		257668BD253B11B60027A05E /* YQQSideFilterItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 257668BC253B11B60027A05E /* YQQSideFilterItem.m */; };
 		257668C2253B14540027A05E /* YQQSideFilterCategoryModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 257668C1253B14540027A05E /* YQQSideFilterCategoryModel.m */; };
 		25897BCA253D98D00083D03C /* YQQCollectionPushReusableHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 25897BC8253D98D00083D03C /* YQQCollectionPushReusableHeaderView.m */; };
@@ -29,8 +29,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		257668A6253AB41A0027A05E /* YQQSideFilterViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YQQSideFilterViewController.h; sourceTree = "<group>"; };
-		257668A7253AB41A0027A05E /* YQQSideFilterViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YQQSideFilterViewController.m; sourceTree = "<group>"; };
+		2509E4AA260470050075F62C /* YQQSideFilterViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YQQSideFilterViewController.h; sourceTree = "<group>"; };
+		2509E4AB260470050075F62C /* YQQSideFilterViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YQQSideFilterViewController.m; sourceTree = "<group>"; };
 		257668BB253B11B60027A05E /* YQQSideFilterItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YQQSideFilterItem.h; sourceTree = "<group>"; };
 		257668BC253B11B60027A05E /* YQQSideFilterItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YQQSideFilterItem.m; sourceTree = "<group>"; };
 		257668C0253B14540027A05E /* YQQSideFilterCategoryModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YQQSideFilterCategoryModel.h; sourceTree = "<group>"; };
@@ -77,10 +77,8 @@
 		255937AB253D83640016EC3E /* Controller */ = {
 			isa = PBXGroup;
 			children = (
-				257668A6253AB41A0027A05E /* YQQSideFilterViewController.h */,
-				257668A7253AB41A0027A05E /* YQQSideFilterViewController.m */,
-				25D6CE7A253DB72E005B8F55 /* YQQCompanyViewController.h */,
-				25D6CE7B253DB72E005B8F55 /* YQQCompanyViewController.m */,
+				2509E4AA260470050075F62C /* YQQSideFilterViewController.h */,
+				2509E4AB260470050075F62C /* YQQSideFilterViewController.m */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -151,6 +149,8 @@
 				25DFBEB0253AABF000935726 /* AppDelegate.m */,
 				25DFBEB5253AABF000935726 /* ViewController.h */,
 				25DFBEB6253AABF000935726 /* ViewController.m */,
+				25D6CE7A253DB72E005B8F55 /* YQQCompanyViewController.h */,
+				25D6CE7B253DB72E005B8F55 /* YQQCompanyViewController.m */,
 				25DFBEB8253AABF000935726 /* Main.storyboard */,
 				25DFBEBB253AABF200935726 /* Assets.xcassets */,
 				25DFBEBD253AABF200935726 /* LaunchScreen.storyboard */,
@@ -242,7 +242,7 @@
 				25897BD6253D98F70083D03C /* YQQCollectionSwitchReusableHeaderView.m in Sources */,
 				25DFBEC2253AABF200935726 /* main.m in Sources */,
 				25897BDC253D991E0083D03C /* YQQCollectionViewNormalCell.m in Sources */,
-				257668A8253AB41A0027A05E /* YQQSideFilterViewController.m in Sources */,
+				2509E4AC260470050075F62C /* YQQSideFilterViewController.m in Sources */,
 				25D6CE7C253DB72E005B8F55 /* YQQCompanyViewController.m in Sources */,
 				257668C2253B14540027A05E /* YQQSideFilterCategoryModel.m in Sources */,
 			);
@@ -390,7 +390,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = W43WD399J7;
 				INFOPLIST_FILE = Example/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -409,7 +409,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = W43WD399J7;
 				INFOPLIST_FILE = Example/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

@@ -21,7 +21,6 @@
 
 - (IBAction)actiom:(UIButton *)sender {
     if (_categoryModel.type == YQQSideFilterCategoryModelTypeSwitch) {
-        _categoryModel.isOpen = !_categoryModel.isOpen;
         if ([self.delegate respondsToSelector:@selector(reusableView:didSelectModel:)]) {
             [self.delegate reusableView:self didSelectModel:_categoryModel];
         }

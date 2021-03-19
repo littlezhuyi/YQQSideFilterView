@@ -2,33 +2,28 @@
 //  YQQSideFilterViewController.m
 //  Example
 //
-//  Created by zhuyi on 2020/10/17.
+//  Created by 朱逸 on 2021/3/19.
 //
 
 #import "YQQSideFilterViewController.h"
-#import "YQQCollectionPushReusableHeaderView.h"
-#import "YQQCollectionSwitchReusableHeaderView.h"
-#import "YQQCollectionReusableFooterView.h"
-#import "YQQCollectionViewNormalCell.h"
-#import "YQQSideFilterCategoryModel.h"
-#import "YQQSideFilterItem.h"
-#import "YQQCollectionBaseReusableView.h"
-#import "YQQCompanyViewController.h"
 
-#define SCREEN_WIDTH [[UIScreen mainScreen] bounds].size.width
-#define SCREEN_HEIGHT [[UIScreen mainScreen] bounds].size.height
-
-#define Filter_ORIGIN_FRAME CGRectMake(SCREEN_WIDTH, 0, SCREEN_WIDTH - self.sideSlipLeading, SCREEN_HEIGHT)
-#define Filter_DISTINATION_FRAME CGRectMake(self.sideSlipLeading, 0, SCREEN_WIDTH - self.sideSlipLeading, SCREEN_HEIGHT)
-#define Filter_Bottom_Height 62
-
-@interface YQQSideFilterViewController () <UIGestureRecognizerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, YQQCollectionBaseReusableViewDelegate>
+@interface YQQSideFilterViewController () <UIGestureRecognizerDelegate, UICollectionViewDelegate, UICollectionViewDataSource>
 
 @property (nonatomic, strong) UIView *dimView;
 
 @property (nonatomic, strong) UINavigationController *navigationController;
 
 @property (nonatomic, strong) UICollectionView *collectionView;
+
+@property (nonatomic, strong) UIView *bottomButtonContainer;
+
+@property (nonatomic, strong) UIView *bottomButtonContainerSeparator;
+
+@property (nonatomic, strong) UIButton *resetButton;
+
+@property (nonatomic, strong) UIButton *confirmButton;
+
+@property (nonatomic, assign) CGRect contentFrame;
 
 @end
 
@@ -39,155 +34,211 @@
     if (self) {
         _navigationController = [[UINavigationController alloc] initWithRootViewController:self];
         _sideSlipLeading = 100;
-        _navigationController.view.frame = Filter_ORIGIN_FRAME;
-        _navigationController.navigationBarHidden = YES;
+        _bottomButtonContainerHeight = 62;
         _navigationController.navigationBar.translucent = NO;
+        
+        UIBezierPath *bezierPath = [UIBezierPath bezierPathWithRoundedRect:[UIScreen mainScreen].bounds byRoundingCorners:UIRectCornerTopLeft | UIRectCornerBottomLeft cornerRadii:CGSizeMake(10, 10)];
+        CAShapeLayer *shapLayer = [CAShapeLayer layer];
+        shapLayer.path = bezierPath.CGPath;
+        self.view.layer.mask = shapLayer;
+        
+        [self.view addSubview:self.bottomButtonContainer];
+        [self.bottomButtonContainer addSubview:self.bottomButtonContainerSeparator];
+        [self.bottomButtonContainer addSubview:self.resetButton];
+        [self.bottomButtonContainer addSubview:self.confirmButton];
+        [self.view addSubview:self.collectionView];
     }
     return self;
 }
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    // Do any additional setup after loading the view.
-    self.view.backgroundColor = [UIColor whiteColor];
-    
-    UIBezierPath *bezierPath = [UIBezierPath bezierPathWithRoundedRect:[UIScreen mainScreen].bounds byRoundingCorners:UIRectCornerTopLeft | UIRectCornerBottomLeft cornerRadii:CGSizeMake(10, 10)];
-    CAShapeLayer *shapLayer = [CAShapeLayer layer];
-    shapLayer.path = bezierPath.CGPath;
-    self.view.layer.mask = shapLayer;
-    
-    [self UIConfiguration];
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    _navigationController.navigationBarHidden = YES;
 }
 
-- (void)UIConfiguration {
-    UIView *bottomBar = [self createBottomBar];
-    [self.view addSubview:bottomBar];
-    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(0)-[bottomBar]-(0)-|" options:0 metrics:nil views:NSDictionaryOfVariableBindings(bottomBar)]];
-    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[bottomBar]-|" options:0 metrics:nil views:NSDictionaryOfVariableBindings(bottomBar)]];
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:bottomBar attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.f constant:62]];
-    
-    [self.view addSubview:self.collectionView];
-    UICollectionView *collectionView = self.collectionView;
-    NSDictionary *tableViewMetrics = @{@"top": @(0), @"leading":@(0), @"bottom": @(62), @"trailing":@(0)};
-    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(leading)-[collectionView]-(trailing)-|" options:0 metrics:tableViewMetrics views:NSDictionaryOfVariableBindings(collectionView)]];
-    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(top)-[collectionView]-(bottom)-|" options:0 metrics:tableViewMetrics views:NSDictionaryOfVariableBindings(collectionView)]];
+- (void)viewWillLayoutSubviews {
+    [super viewWillLayoutSubviews];
+    self.bottomButtonContainer.frame = CGRectMake(0, CGRectGetMaxY(self.view.frame) - _bottomButtonContainerHeight, CGRectGetWidth(self.view.frame), _bottomButtonContainerHeight);
+    self.bottomButtonContainerSeparator.frame = CGRectMake(0, 0, CGRectGetWidth(self.view.frame), 1);
+    self.resetButton.frame = CGRectMake(16, 16, (CGRectGetWidth(self.view.frame) - 48) / 2.0, 30);
+    self.confirmButton.frame = CGRectMake(32 + (CGRectGetWidth(self.view.frame) - 48) / 2.0, 16, (CGRectGetWidth(self.view.frame) - 48) / 2.0, 30);
+    self.collectionView.frame = CGRectMake(0, 0, CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame) - _bottomButtonContainerHeight);
 }
 
-#pragma mark - YQQCollectionBaseReusableViewDelegate
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    _navigationController.navigationBarHidden = NO;
+}
 
-- (void)reusableView:(YQQCollectionBaseReusableView *)reusableView didSelectModel:(YQQSideFilterCategoryModel *)categoryModel {
-    if (categoryModel.type == YQQSideFilterCategoryModelTypePush) {
-        [self.navigationController pushViewController:[YQQCompanyViewController new] animated:YES];
-    } else if (categoryModel.type == YQQSideFilterCategoryModelTypeSwitch) {
-        [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:reusableView.indexPath.section]];
-        if (categoryModel.isOpen) {
-            [self.collectionView selectItemAtIndexPath:reusableView.indexPath animated:YES scrollPosition:UICollectionViewScrollPositionCenteredVertically];
-        }
+- (void)dealloc {
+    NSLog(@"%@♻️", NSStringFromClass([self class]));
+}
+
+#pragma mark - UIGestureRecognizerDelegate
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    if(touch.view == self.dimView) {
+        return YES;
+    }
+    return NO;
+}
+
+#pragma mark - UICollectionViewDelegateFlowLayout
+
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section {
+    if ([self.dataSource respondsToSelector:@selector(sideFilterViewController:referenceSizeForHeaderInSection:)]) {
+        return [self.dataSource sideFilterViewController:self referenceSizeForHeaderInSection:section];
+    } else {
+        return CGSizeMake(self.view.frame.size.width, 60);
+    }
+}
+
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForFooterInSection:(NSInteger)section {
+    if ([self.dataSource respondsToSelector:@selector(sideFilterViewController:referenceSizeForFooterInSection:)]) {
+        return [self.dataSource sideFilterViewController:self referenceSizeForFooterInSection:section];
+    } else {
+        return CGSizeMake(self.view.frame.size.width, 60);
+    }
+}
+
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
+    if ([self.dataSource respondsToSelector:@selector(sideFilterViewController:sizeForItemAtIndexPath:)]) {
+        return [self.dataSource sideFilterViewController:self sizeForItemAtIndexPath:indexPath];
+    } else {
+        return CGSizeMake(floorf(self.view.frame.size.width / 3.0), 30);
+    }
+}
+
+- (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
+    if ([self.dataSource respondsToSelector:@selector(sideFilterViewController:insetForSectionAtIndex:)]) {
+        return [self.dataSource sideFilterViewController:self insetForSectionAtIndex:section];
+    } else {
+        return UIEdgeInsetsMake(8, 16, 8, 16);
+    }
+}
+
+- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section {
+    if ([self.dataSource respondsToSelector:@selector(sideFilterViewController:minimumLineSpacingForSectionAtIndex:)]) {
+        return [self.dataSource sideFilterViewController:self minimumLineSpacingForSectionAtIndex:section];
+    } else {
+        return 16;
+    }
+}
+
+- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section {
+    if ([self.dataSource respondsToSelector:@selector(sideFilterViewController:minimumInteritemSpacingForSectionAtIndex:)]) {
+        return [self.dataSource sideFilterViewController:self minimumInteritemSpacingForSectionAtIndex:section];
+    } else {
+        return 16;
     }
 }
 
 #pragma mark - UICollectionViewDelegate
 
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section {
-    YQQSideFilterCategoryModel *categoryModel = [self.dataArray objectAtIndex:section];
-    return CGSizeMake(self.view.frame.size.width, categoryModel.headerHeight);
-}
-
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForFooterInSection:(NSInteger)section {
-    YQQSideFilterCategoryModel *categoryModel = [self.dataArray objectAtIndex:section];
-    return CGSizeMake(self.view.frame.size.width, categoryModel.footerHeight);
-}
-
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    YQQSideFilterCategoryModel *categoryModel = [self.dataArray objectAtIndex:indexPath.section];
-    YQQSideFilterItem *item = [categoryModel.items objectAtIndex:indexPath.item];
-    item.selected = !item.selected;
-    [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
-}
-
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    return CGSizeMake(75, 28);
-}
-
-- (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
-    return UIEdgeInsetsMake(8, 16, 8, 16);
-}
-
-- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section {
-    return 16;
+    if ([self.delegate respondsToSelector:@selector(sideFilterViewController:didSelectItemAtIndexPath:)]) {
+        [self.delegate sideFilterViewController:self didSelectItemAtIndexPath:indexPath];
+    }
 }
 
 #pragma mark - UICollectionViewDataSource
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    YQQSideFilterCategoryModel *categoryModel = [self.dataArray objectAtIndex:section];
-    if (categoryModel.type == YQQSideFilterCategoryModelTypeSwitch) {
-        if (categoryModel.isOpen) {
-            return categoryModel.items.count;
-        } else {
-            return 0;
-        }
-    } else {
-        return categoryModel.items.count;
+    if ([self.dataSource respondsToSelector:@selector(sideFilterViewController:numberOfItemsInSection:)]) {
+        return [self.dataSource sideFilterViewController:self numberOfItemsInSection:section];
     }
+    return 0;
 }
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
-    return self.dataArray.count;
+    if ([self.dataSource respondsToSelector:@selector(numberOfSectionsInsideFilterViewController:)]) {
+        return [self.dataSource numberOfSectionsInsideFilterViewController:self];
+    } else {
+        return 1;
+    }
+    
 }
 
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath {
-    YQQSideFilterCategoryModel *categoryModel = [self.dataArray objectAtIndex:indexPath.section];
-    if ([kind isEqualToString:UICollectionElementKindSectionHeader]) {
-        YQQCollectionBaseReusableView *reusableView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:categoryModel.headerReuseIdentifier forIndexPath:indexPath];
-        reusableView.categoryModel = categoryModel;
-        reusableView.delegate = self;
-        reusableView.indexPath = indexPath;
-        return reusableView;
-    } else if ([kind isEqualToString:UICollectionElementKindSectionFooter]) {
-        YQQCollectionBaseReusableView *reusableView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:categoryModel.footerReuseIdentifier forIndexPath:indexPath];
-        reusableView.categoryModel = categoryModel;
-        reusableView.delegate = self;
-        reusableView.indexPath = indexPath;
-        return reusableView;
+    UICollectionReusableView *reusableView;
+    if ([self.delegate respondsToSelector:@selector(sideFilterViewController:viewForSupplementaryElementOfKind:atIndexPath:)]) {
+        reusableView = [self.dataSource sideFilterViewController:self viewForSupplementaryElementOfKind:kind atIndexPath:indexPath];
     }
-    return nil;
+    return reusableView;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    YQQSideFilterCategoryModel *categoryModel = [self.dataArray objectAtIndex:indexPath.section];
-    YQQSideFilterItem *item = [categoryModel.items objectAtIndex:indexPath.item];
-    YQQCollectionViewNormalCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:item.reuseIdentifier forIndexPath:indexPath];
-    cell.item = [categoryModel.items objectAtIndex:indexPath.item];
+    UICollectionViewCell *cell = [self.dataSource sideFilterViewController:self cellForItemAtIndexPath:indexPath];
     return cell;
 }
 
 #pragma mark - Public
 
 - (void)show {
-    [self.dimView addSubview:_navigationController.view];
-    [[UIApplication sharedApplication].delegate.window addSubview:self.dimView];
+    [self showInView:[UIApplication sharedApplication].delegate.window];
+}
+
+- (void)showInView:(UIView *)view {
+    self.dimView.frame = view.bounds;
+    _navigationController.view.frame = CGRectMake(self.dimView.frame.size.width, 0, self.dimView.frame.size.width - self.sideSlipLeading, self.dimView.frame.size.height);
+    [view addSubview:self.dimView];
+    [self.dimView addSubview:self.navigationController.view];
     [UIView animateWithDuration:0.3 animations:^{
         self.dimView.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
-        self.navigationController.view.frame = Filter_DISTINATION_FRAME;
+        self.navigationController.view.frame = CGRectMake(self.sideSlipLeading, 0, self.dimView.frame.size.width - self.sideSlipLeading, self.dimView.frame.size.height);
     }];
 }
 
 - (void)close {
     [UIView animateWithDuration:0.3 animations:^{
         self.dimView.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0];
-        self.navigationController.view.frame = Filter_ORIGIN_FRAME;
+        self.navigationController.view.frame =  CGRectMake(self.dimView.frame.size.width, 0, self.dimView.frame.size.width - self.sideSlipLeading, self.dimView.frame.size.height);
     } completion:^(BOOL finished) {
-        [self.navigationController.view removeFromSuperview];
         [self.dimView removeFromSuperview];
     }];
 }
 
-#pragma mark - Action
-
-- (void)clickDimView:(UITapGestureRecognizer *)tap {
-    [self close];
+- (void)reloadData {
+    [self.collectionView reloadData];
 }
+
+- (void)pushViewController:(UIViewController *)controller {
+    [self.navigationController pushViewController:controller animated:YES];
+}
+
+- (void)registerClass:(Class)Class forCellWithReuseIdentifier:(NSString *)identifier {
+    [self.collectionView registerClass:Class forCellWithReuseIdentifier:identifier];
+}
+
+- (void)registerNib:(UINib *)nib forCellWithReuseIdentifier:(NSString *)identifier {
+    [self.collectionView registerNib:nib forCellWithReuseIdentifier:identifier];
+}
+
+- (void)registerClass:(nullable Class)viewClass forSupplementaryViewOfKind:(NSString *)elementKind withReuseIdentifier:(NSString *)identifier {
+    [self.collectionView registerClass:viewClass forSupplementaryViewOfKind:elementKind withReuseIdentifier:identifier];
+}
+- (void)registerNib:(nullable UINib *)nib forSupplementaryViewOfKind:(NSString *)kind withReuseIdentifier:(NSString *)identifier {
+    [self.collectionView registerNib:nib forSupplementaryViewOfKind:kind withReuseIdentifier:identifier];
+}
+
+- (__kindof UICollectionViewCell *)dequeueReusableCellWithReuseIdentifier:(NSString *)identifier forIndexPath:(nonnull NSIndexPath *)indexPath {
+    UICollectionViewCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:identifier forIndexPath:indexPath];
+    return cell;
+}
+
+- (__kindof UICollectionReusableView *)dequeueReusableSupplementaryViewOfKind:(NSString *)elementKind withReuseIdentifier:(NSString *)identifier forIndexPath:(NSIndexPath *)indexPath {
+    if ([elementKind isEqualToString:UICollectionElementKindSectionHeader]) {
+        UICollectionReusableView *reusableView = [self.collectionView dequeueReusableSupplementaryViewOfKind:elementKind withReuseIdentifier:identifier forIndexPath:indexPath];
+        return reusableView;
+    } else if ([elementKind isEqualToString:UICollectionElementKindSectionFooter]) {
+        UICollectionReusableView *reusableView = [self.collectionView dequeueReusableSupplementaryViewOfKind:elementKind withReuseIdentifier:identifier forIndexPath:indexPath];
+        return reusableView;
+    } else {
+        return nil;
+    }
+}
+
+#pragma mark - Action
 
 - (void)commitButtonAction:(UIButton *)sender {
     if ([self.delegate respondsToSelector:@selector(sideFilterViewController:didSelectActionType:)]) {
@@ -200,58 +251,6 @@
     if ([self.delegate respondsToSelector:@selector(sideFilterViewController:didSelectActionType:)]) {
         [self.delegate sideFilterViewController:self didSelectActionType:YQQSideFilterViewControllerActionTypeReset];
     }
-}
-
-- (UIView *)createBottomBar {
-    UIView *view = [[UIView alloc] init];
-    view.translatesAutoresizingMaskIntoConstraints = NO;
-    
-    UIView *topLine = [[UIView alloc] init];
-    topLine.backgroundColor = [UIColor colorWithRed:150.0/255.0 green:150.0/255.0 blue:150.0/255.0 alpha:1];
-    topLine.translatesAutoresizingMaskIntoConstraints = NO;
-    [view addSubview:topLine];
-    [view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(0)-[topLine]-(0)-|" options:0 metrics:nil views:NSDictionaryOfVariableBindings(topLine)]];
-    [view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(0)-[topLine]" options:0 metrics:nil views:NSDictionaryOfVariableBindings(topLine)]];
-    [view addConstraint:[NSLayoutConstraint constraintWithItem:topLine attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.f constant:1]];
-
-    UIButton *resetButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    resetButton.translatesAutoresizingMaskIntoConstraints = NO;
-    [view addSubview:resetButton];
-    [resetButton setTitle:@"重置" forState:UIControlStateNormal];
-    resetButton.titleLabel.font = [UIFont fontWithName:@"PingFangSC-Medium" size:13];
-    [resetButton setTitleColor:[UIColor colorWithRed:40/255.0 green:40/255.0 blue:40/255.0 alpha:1.0] forState:UIControlStateNormal];
-    [resetButton setBackgroundColor:[UIColor whiteColor]];
-    resetButton.layer.cornerRadius = 15;
-    resetButton.layer.borderColor = [UIColor colorWithRed:140/255.0 green:140/255.0 blue:140/255.0 alpha:1.0].CGColor;
-    resetButton.layer.borderWidth = 1;
-    [resetButton addTarget:self action:@selector(resetButtonAction:) forControlEvents:UIControlEventTouchUpInside];
-    
-    UIButton *commitButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    commitButton.translatesAutoresizingMaskIntoConstraints = NO;
-    [view addSubview:commitButton];
-    [commitButton setTitle:@"确定" forState:UIControlStateNormal];
-    commitButton.titleLabel.font = [UIFont fontWithName:@"PingFangSC-Medium" size:13];
-    [commitButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [commitButton setBackgroundColor:[UIColor colorWithRed:26/255.0 green:203/255.0 blue:151/255.0 alpha:1.0]];
-    commitButton.layer.cornerRadius = 15;
-    commitButton.layer.borderColor = [UIColor colorWithRed:255.0/255.0 green:255.0/255.0 blue:255.0/255.0 alpha:1.0].CGColor;
-    commitButton.layer.borderWidth = 1;
-    [commitButton addTarget:self action:@selector(commitButtonAction:) forControlEvents:UIControlEventTouchUpInside];
-    
-    [view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(16)-[resetButton]-(16)-[commitButton]-(16)-|" options:0 metrics:nil views:NSDictionaryOfVariableBindings(resetButton, commitButton)]];
-    [view addConstraint:[NSLayoutConstraint constraintWithItem:resetButton attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.f constant:30]];
-    [view addConstraint:[NSLayoutConstraint constraintWithItem:commitButton attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.f constant:30]];
-    [view addConstraint:[NSLayoutConstraint constraintWithItem:resetButton attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeCenterY multiplier:1.f constant:0]];
-    [view addConstraint:[NSLayoutConstraint constraintWithItem:commitButton attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeCenterY multiplier:1.f constant:0]];
-    [view addConstraint:[NSLayoutConstraint constraintWithItem:resetButton attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:commitButton attribute:NSLayoutAttributeWidth multiplier:1.f constant:0]];
-    return view;
-}
-
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
-    if(touch.view == self.dimView) {
-        return YES;
-    }
-    return NO;
 }
 
 #pragma mark - Associated
@@ -271,7 +270,11 @@
         _collectionView.bounces = YES;
         _collectionView.backgroundColor = [UIColor whiteColor];
         _collectionView.showsVerticalScrollIndicator = NO;
-        _collectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+        if (@available(iOS 11.0, *)) {
+            _collectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+        } else {
+            self.automaticallyAdjustsScrollViewInsets = NO;
+        }
         [_collectionView registerNib:[UINib nibWithNibName:@"YQQCollectionViewNormalCell" bundle:nil] forCellWithReuseIdentifier:@"YQQCollectionViewNormalCell"];
         [_collectionView registerNib:[UINib nibWithNibName:@"YQQCollectionPushReusableHeaderView" bundle:nil] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"YQQCollectionPushReusableHeaderView"];
         [_collectionView registerNib:[UINib nibWithNibName:@"YQQCollectionSwitchReusableHeaderView" bundle:nil] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"YQQCollectionSwitchReusableHeaderView"];
@@ -280,11 +283,69 @@
     return _collectionView;
 }
 
+- (UIButton *)resetButton {
+    if (!_resetButton) {
+        if ([self.dataSource respondsToSelector:@selector(resetButtonForSideFilterViewController:)]) {
+            _resetButton = [self.dataSource resetButtonForSideFilterViewController:self];
+        } else {
+            _resetButton = [UIButton buttonWithType:UIButtonTypeCustom];
+            _resetButton.translatesAutoresizingMaskIntoConstraints = NO;
+            [_resetButton setTitle:@"重置" forState:UIControlStateNormal];
+            _resetButton.titleLabel.font = [UIFont fontWithName:@"PingFangSC-Medium" size:13];
+            [_resetButton setTitleColor:[UIColor colorWithRed:40/255.0 green:40/255.0 blue:40/255.0 alpha:1.0] forState:UIControlStateNormal];
+            [_resetButton setBackgroundColor:[UIColor whiteColor]];
+            _resetButton.layer.cornerRadius = 15;
+            _resetButton.layer.borderColor = [UIColor colorWithRed:140/255.0 green:140/255.0 blue:140/255.0 alpha:1.0].CGColor;
+            _resetButton.layer.borderWidth = 1;
+            [_resetButton addTarget:self action:@selector(resetButtonAction:) forControlEvents:UIControlEventTouchUpInside];
+        }
+    }
+    return _resetButton;
+}
+
+- (UIButton *)confirmButton {
+    if (!_confirmButton) {
+        if ([self.dataSource respondsToSelector:@selector(confirmButtonForSideFilterViewController:)]) {
+            _confirmButton = [self.dataSource confirmButtonForSideFilterViewController:self];
+        } else {
+            _confirmButton = [UIButton buttonWithType:UIButtonTypeCustom];
+            _confirmButton.translatesAutoresizingMaskIntoConstraints = NO;
+            [_confirmButton setTitle:@"确定" forState:UIControlStateNormal];
+            _confirmButton.titleLabel.font = [UIFont fontWithName:@"PingFangSC-Medium" size:13];
+            [_confirmButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+            [_confirmButton setBackgroundColor:[UIColor colorWithRed:26/255.0 green:203/255.0 blue:151/255.0 alpha:1.0]];
+            _confirmButton.layer.cornerRadius = 15;
+            _confirmButton.layer.borderColor = [UIColor colorWithRed:255.0/255.0 green:255.0/255.0 blue:255.0/255.0 alpha:1.0].CGColor;
+            _confirmButton.layer.borderWidth = 1;
+            [_confirmButton addTarget:self action:@selector(commitButtonAction:) forControlEvents:UIControlEventTouchUpInside];
+        }
+    }
+    return _confirmButton;
+}
+
+- (UIView *)bottomButtonContainer {
+    if (!_bottomButtonContainer) {
+        _bottomButtonContainer = UIView.new;
+        _bottomButtonContainer.backgroundColor = UIColor.whiteColor;
+        _bottomButtonContainer.translatesAutoresizingMaskIntoConstraints = NO;
+    }
+    return _bottomButtonContainer;
+}
+
+- (UIView *)bottomButtonContainerSeparator {
+    if (!_bottomButtonContainerSeparator) {
+        _bottomButtonContainerSeparator = [[UIView alloc] init];
+        _bottomButtonContainerSeparator.backgroundColor = [UIColor colorWithRed:150.0/255.0 green:150.0/255.0 blue:150.0/255.0 alpha:1];
+        _bottomButtonContainerSeparator.translatesAutoresizingMaskIntoConstraints = NO;
+    }
+    return _bottomButtonContainerSeparator;
+}
+
 - (UIView *)dimView {
     if (!_dimView) {
-        _dimView = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+        _dimView = [[UIView alloc] init];
         _dimView.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0];
-        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(clickDimView:)];
+        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(close)];
         tap.delegate = self;
         [_dimView addGestureRecognizer:tap];
     }

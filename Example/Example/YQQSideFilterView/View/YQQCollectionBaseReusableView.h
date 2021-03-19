@@ -11,6 +11,7 @@
 
 @protocol YQQCollectionBaseReusableViewDelegate <NSObject>
 
+@optional
 - (void)reusableView:(YQQCollectionBaseReusableView *_Nullable)reusableView didSelectModel:(YQQSideFilterCategoryModel *_Nullable)categoryModel;
 
 @end
